@@ -4,24 +4,36 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use App\Models\Publication;
+use App\Models\Category;
+use App\Models\PublicationCategory;
 
-class PublicationsCategoriesSeeder extends Seeder
+class PublicationCategorySeeder extends Seeder
 {
-public function run(): void
+    /**
+     * Run the database seeds.
+     */
+    public function run(): void
     {
-        DB::table('publications_categories')->insert([
-            [
-                'publication_id' => 1,
-                'category_id' => 2,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'publication_id' => 1,
-                'category_id' => 3,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-        ]);
+        // Limpiar tabla existente
+        PublicationCategory::truncate();
+
+        $publications = Publication::all();
+        $categories = Category::all();
+
+        if ($publications->isEmpty() || $categories->isEmpty()) {
+            $this->command->error('❌ No hay publicaciones o categorías para crear relaciones');
+            return;
+        }
+
+        // Crear 20 asignaciones aleatorias
+        for ($i = 0; $i < 20; $i++) {
+            PublicationCategory::create([
+                'publication_id' => $publications->random()->id,
+                'category_id' => $categories->random()->id
+            ]);
+        }
+
+        $this->command->info('✅ 20 asignaciones publicación-categoría creadas!');
     }
 }
